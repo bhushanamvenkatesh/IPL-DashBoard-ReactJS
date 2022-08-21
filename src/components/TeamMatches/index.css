@@ -1,0 +1,35 @@
+/* Write your CSS here */
+
+.team-matches-container {
+  background-color: red;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.banner-image-container {
+  display: flex;
+  justify-content: center;
+
+  border: 1px solid white;
+  flex-direction: column;
+  align-items: center;
+}
+
+.latest-match-heading {
+  color: white;
+
+  border: 1px solid white;
+  width: 100%;
+}
+
+.container {
+  width: 80%;
+}
+
+.team-banner-image {
+  width: 100%;
+}
