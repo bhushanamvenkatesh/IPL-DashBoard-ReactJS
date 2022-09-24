@@ -7,8 +7,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  border: 5px soled yellow;
+  flex-direction: column;
 }
 
 * {
   color: white;
+}
+
+.heading-details {
+  margin: 5px;
+  border: 2px solid green;
 }

@@ -1,5 +1,6 @@
 // Write your code here
-import {async} from 'rxjs'
+import Loader from 'react-loader-spinner'
+import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css'
 
 import {Component} from 'react'
 import TeamCard from '../TeamCard'
@@ -7,10 +8,9 @@ import TeamCard from '../TeamCard'
 import './index.css'
 
 class Home extends Component {
-  state = {teamsData: []}
+  state = {teamsData: [], isLoading: true}
 
   componentDidMount() {
-    console.log('called')
     this.getTeamsData()
   }
 
@@ -26,11 +26,11 @@ class Home extends Component {
       teamImageUrl: eachTeam.team_image_url,
     }))
 
-    this.setState({teamsData: formattedData})
+    this.setState({teamsData: formattedData, isLoading: false})
   }
 
   render() {
-    const {teamsData} = this.state
+    const {teamsData, isLoading} = this.state
     return (
       <div className="Home-component">
         <div className="logo-image-heading">
@@ -41,11 +41,23 @@ class Home extends Component {
           />
           <h1 className="heading">IPL Dashboard</h1>
         </div>
-        <ul className="list">
-          {teamsData.map(eachItem => (
-            <TeamCard eachItem={eachItem} key={eachItem.id} />
-          ))}
-        </ul>
+        {isLoading ? (
+          <div testid="loader">
+            <Loader
+              type="Oval"
+              color="#00BFBFBF"
+              height={50}
+              width={50}
+              testid="loader"
+            />
+          </div>
+        ) : (
+          <ul className="list">
+            {teamsData.map(eachItem => (
+              <TeamCard eachItem={eachItem} key={eachItem.id} />
+            ))}
+          </ul>
+        )}
       </div>
     )
   }

@@ -1,63 +1,91 @@
 import {Component} from 'react'
-import LatestMatch from '../LatestMatch'
+import Loader from 'react-loader-spinner'
 import './index.css'
-
-const teamMatchesApiUrl = 'https://apis.ccbp.in/ipl/KKR'
+import LatestMatch from '../LatestMatch'
+import MatchCard from '../MatchCard'
 
 class TeamMatches extends Component {
-  state = {teamMatches: {}}
+  state = {data: {}, isloading: true}
 
   componentDidMount() {
-    this.getTeamMatchDetails()
+    this.getData()
   }
 
-  getLatestMatchDetailsData = data1 => ({
-    competingTeam: data1.competing_team,
-    competingTeamLogo: data1.competing_team_logo,
-    date: data1.date,
-    firstInnings: data1.first_innings,
-    id: data1.id,
-    manOfTheMatch: data1.man_of_the_match,
-    matchStatus: data1.match_status,
-    result: data1.result,
-    secondInnings: data1.second_innings,
-    umpires: data1.umpires,
-    venue: data1.venue,
-  })
+  getLatestMatchDetails = matchDetails => {
+    const formattedMatchDetails = {
+      competingTeam: matchDetails.competing_team,
+      competingTeamLogo: matchDetails.competing_team_logo,
+      date: matchDetails.date,
+      firstInnings: matchDetails.first_innings,
+      id: matchDetails.id,
+      manOfTheMatch: matchDetails.man_of_the_match,
+      matchStatus: matchDetails.match_status,
+      result: matchDetails.result,
+      secondInnings: matchDetails.second_innings,
+      umpires: matchDetails.umpires,
+      venue: matchDetails.venue,
+    }
+    return formattedMatchDetails
+  }
 
-  getTeamMatchDetails = async () => {
-    const response = await fetch(teamMatchesApiUrl)
+  getRecentMatches = data => {
+    const recentMatches = data.map(data1 => ({
+      competingTeam: data1.competing_team,
+      competingTeamLogo: data1.competing_team_logo,
+      matchStatus: data1.match_status,
+      result: data1.result,
+      id: data1.id,
+    }))
+
+    return recentMatches
+  }
+
+  getData = async () => {
+    const {match} = this.props
+    const {params} = match
+    const {id} = params
+    console.log(id)
+
+    const response = await fetch(`https://apis.ccbp.in/ipl/${id}`)
     const data = await response.json()
-
-    // const recentMatches = data.recent_matches
 
     const formattedData = {
       teamBannerUrl: data.team_banner_url,
-      latestMatchDetails: this.getLatestMatchDetailsData(
-        data.latest_match_details,
-      ),
+      latestMatchDetails: this.getLatestMatchDetails(data.latest_match_details),
+      recentMatches: this.getRecentMatches(data.recent_matches),
     }
 
-    this.setState({teamMatches: formattedData})
-    // console.log(this.state)
+    this.setState({data: formattedData, isloading: false})
   }
 
-  render() {
-    const {teamMatches} = this.state
-    const {teamBannerUrl, latestMatchDetails} = teamMatches
-    // console.log(latestMatchDetails)
+  renderLoader = () => (
+    <div testid="loader">
+      <Loader type="Oval" height={50} width={50} />
+    </div>
+  )
 
+  renderPage = () => {
+    const {data} = this.state
+    const {teamBannerUrl, latestMatchDetails, recentMatches} = data
+    console.log(recentMatches)
     return (
       <div className="team-matches-container">
-        <div className="banner-image-container">
-          <img src={teamBannerUrl} alt="alt" className="team-banner-image" />
-          <h1 className="latest-match-heading">Latest Matches</h1>
-        </div>
+        <img src={teamBannerUrl} alt="team banner" className="banner-image" />
         <div>
           <LatestMatch latestMatchDetails={latestMatchDetails} />
         </div>
+        <ul className="list">
+          {recentMatches.map(eachItem => (
+            <MatchCard eachItem={eachItem} key={eachItem.id} />
+          ))}
+        </ul>
       </div>
     )
+  }
+
+  render() {
+    const {isloading} = this.state
+    return <div>{isloading ? this.renderLoader() : this.renderPage()}</div>
   }
 }
 
